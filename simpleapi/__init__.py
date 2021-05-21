@@ -34,7 +34,6 @@ def get_db():
         db.close()
 
 
-
 #* AUTHORIZATION UTILS
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -75,7 +74,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = crud.get_user(get_db(), username=token_data.username)
+    user = crud.get_user(get_db(), token_data.username)
     if user is None:
         raise credentials_exception
     return user
