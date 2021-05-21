@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#poetry lock files
+poetry.lock
+
+#sqlight database files
+/testdata/
+
+#vscode files
+.vscode/
