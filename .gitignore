@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 #poetry lock files
-poetry.lock
+#poetry.lock
 
 #sqlight database files
 /testdata/
