@@ -5,7 +5,7 @@
 
 ## How to deploy to heroku
 
-Heroku doesn't have support for poetry. To make possible deploying application with poetry, install buildpack first.
+Heroku doesn't have support for poetry. To make possible deploying application with poetry, install buildpack first. This build pack generates files for heroku build in python support from poetry.lock. 
 
 ```
 heroku buildpacks:clear -a simpleapi-evox
