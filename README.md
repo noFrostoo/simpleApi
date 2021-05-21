@@ -1,10 +1,10 @@
-# SimpleApi - Evox
+# [SimpleApi - Evox](https://simpleapi-evox.herokuapp.com/)
 
-## Framework
-Fast api 
+## Framework - FastApi  
 ## API
-
-FastApi provides a simple docs view with all endpoints, schemas and exertions. It can be accessed [here](https://simpleapi-evox.herokuapp.com/docs)
+The Api is done in REST Style.
+### Docs
+FastApi provides a simple docs view with all endpoints, schemas and exertions. It can be accessed [here](https://simpleapi-evox.herokuapp.com/docs) or [jsonApi](https://simpleapi-evox.herokuapp.com/openapi.json)
 
 ### Views
 
@@ -302,7 +302,7 @@ url: https://simpleapi-evox.herokuapp.com/{id}
     -H 'Authorization: Bearer -token-'
     ```
 
-#### **Authorize**
+#### [**Authorize**](https://simpleapi-evox.herokuapp.com/docs#/default/login_for_access_token_authorize_post)
 
 Used to authorize a user. Body with new content is required. View requires authorization header.
 
@@ -310,7 +310,7 @@ Used to authorize a user. Body with new content is required. View requires autho
 url: https://simpleapi-evox.herokuapp.com/authorize
 ```
 
-* **Method**: Delete
+* **Method**: Post
 
 * **Parameters**:
     message_id (path) - integer 
@@ -359,12 +359,61 @@ url: https://simpleapi-evox.herokuapp.com/authorize
     -d 'grant_type=password&username=username1&password=password1'
     ```
 
-#### **Welcome**
+#### [**Welcome**](https://simpleapi-evox.herokuapp.com/docs#/default/welcome__get)
 
-## Building and running
+Used to authorize a user. Body with new content is required. View requires authorization header.
 
+```
+url: https://simpleapi-evox.herokuapp.com/
+```
 
-## How to deploy to heroku
+* **Method**: Get
+
+* **Parameters**:
+    None
+* **Request body**:
+    None
+* **Responses**:
+  
+    * Successful response:
+  
+       Code: 200
+       ```
+        {
+        "msg": "Hello World"
+        }
+        ```
+* **Example curl call**:
+
+    ```bash
+    curl -X 'GET' \
+    'https://simpleapi-evox.herokuapp.com/' \
+    -H 'accept: application/json'
+    ```
+
+## Managing and running
+
+First remove poetry.lock file. This file is located in repo for heroku to download correct dependencies. 
+
+To install dependencies using poetry run, this creates poetry.lock file:
+```
+poetry install
+```
+To update dependencies using poetry run:
+```
+poetry update
+```
+To run app using poetry run:
+```
+poetry run
+```
+
+To run tests using poetry run:
+```
+poetry run pytest
+```
+
+## Deployment to Heroku
 
 The app is deployed on [Heroku](https://simpleapi-evox.herokuapp.com/)
 

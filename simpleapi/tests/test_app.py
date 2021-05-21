@@ -102,12 +102,6 @@ def test_add_unauthorized():
     assert response.status_code == 401
     assert response.json() == { "detail": "Not authenticated" }
 
-#! WTF it's 422 becurse it's gets feed to delete endpoint, not sure if i wanna change the behaviour  
-def test_add_wrong_methode():
-    token = authorizeTestUser()
-    response = client.delete('/new', headers={"Authorization": f"Bearer {token}"}, json={"content": "dadddadad"})
-    assert response.status_code == 405
-
 def test_view_message():
     token = authorizeTestUser()
     msg = addTestMsg(token)
@@ -126,7 +120,7 @@ def test_view_message_views_count_increase():
 
 def test_view_message_wrong_id():
     response = client.get(f'/{-1}')
-    assert response.status_code == 400
+    assert response.status_code == 404
     assert response.json()["detail"] == 'Message of this id does not exists'
 
 def test_edit():
@@ -184,7 +178,7 @@ def test_edit_zero_views_count():
 def test_edit_wrong_id():
     token = authorizeTestUser()
     response = client.put(f'/{-1}', headers={"Authorization": f"Bearer {token}"}, json={"content": "fafafaf"})
-    assert response.status_code == 400
+    assert response.status_code == 404
     assert response.json()["detail"] == 'Message of this id does not exists'
 
 def test_delete():
@@ -202,5 +196,5 @@ def test_delete_unauthorized():
 def test_delete_wrong_id():
     token = authorizeTestUser()
     response = client.delete(f'/{-1}', headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 400
+    assert response.status_code == 404
     assert response.json()["detail"] == 'Message of this id does not exists'

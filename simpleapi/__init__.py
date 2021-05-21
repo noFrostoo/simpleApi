@@ -13,7 +13,7 @@ from passlib.context import CryptContext
 from .api import schemas
 from .database import crud, models
 from .database.setup import SessionLocal, engine
-
+from .authorizationsUtils import authenticate_user, create_access_token, get_current_user
 models.Base.metadata.create_all(bind=engine)
 
 SECRET_KEY = "6466ad884a1a601c5ab6610e1d2ac9b46a42a07258e2b8a370b2b66b5a1d095d"
