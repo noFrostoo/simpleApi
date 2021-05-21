@@ -6,10 +6,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from ..database.setup import Base
-from ..database.crud import add_user, check_msg_exists
+from ..database.crud import add_user, check_msg_exists, get_user
 
 Path('testdata').mkdir(exist_ok=True)
 
+#* Prepeare database for tests
 TEST_SQLALCHEMY_DATABASE_URL = 'sqlite:///./testdata/db.sqlite'
 
 testengine = create_engine(
@@ -34,7 +35,8 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
-#TODO: add checking for user and if not adding him
+if not get_user(next(override_get_db()),'test'):
+    add_user(next(override_get_db()), 'test', '$2b$12$vUHa7EIEUXrHVB/t0/fMJOjykZWkQ/mSWFiL7K0wU7WcD9XKPClf.')
 
 def authorizeTestUser():
     response = client.post('/authorize', headers={"Content-Type": "application/x-www-form-urlencoded"}, data="grant_type=password&username=test&password=test")

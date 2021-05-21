@@ -1,10 +1,9 @@
 import uvicorn
 
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime, timedelta
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from jose import JWTError, jwt
@@ -13,7 +12,7 @@ from passlib.context import CryptContext
 from .api import schemas
 from .database import crud, models
 from .database.setup import SessionLocal, engine
-from .authorizationsUtils import authenticate_user, create_access_token, get_current_user
+
 models.Base.metadata.create_all(bind=engine)
 
 SECRET_KEY = "6466ad884a1a601c5ab6610e1d2ac9b46a42a07258e2b8a370b2b66b5a1d095d"
@@ -95,24 +94,24 @@ def check_message_exists(db:Session ,message_id: int):
 
 
 
-
-@app.post('/new', response_model=schemas.Message, responses={400: {"model": schemas.HTTPError}, 413: {"model": schemas.HTTPError}})
+#* VIEW
+@app.post('/new', response_model=schemas.Message, responses={400: {"model": schemas.HTTPError}, 413: {"model": schemas.HTTPError}, 401: {"model": schemas.HTTPError}})
 def new_message(message: schemas.MessageBase, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     check_message_len(message.content)
     return crud.create_message(db, message)
 
-@app.put('/{message_id}', response_model=schemas.Message, responses={400: {"model": schemas.HTTPError}, 413: {"model": schemas.HTTPError}, 404: {"model": schemas.HTTPError}})
+@app.put('/{message_id}', response_model=schemas.Message, responses={400: {"model": schemas.HTTPError}, 413: {"model": schemas.HTTPError}, 404: {"model": schemas.HTTPError}, 401: {"model": schemas.HTTPError}})
 def edit_message(message_id:int, message: schemas.MessageBase, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     check_message_exists(db, message_id)
     check_message_len(message.content)
     return crud.edit_message(db, message, message_id)
 
-@app.delete('/{message_id}', response_model=bool, responses={404: {"model": schemas.HTTPError}})
+@app.delete('/{message_id}', response_model=bool, responses={404: {"model": schemas.HTTPError}, 401: {"model": schemas.HTTPError}})
 def delete_message(message_id:int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     check_message_exists(db, message_id)
     return crud.delete_message(db, message_id)
 
-@app.get('/{message_id}', response_model=schemas.Message, responses={404: {"model": schemas.HTTPError}})
+@app.get('/{message_id}', response_model=schemas.Message, responses={404: {"model": schemas.HTTPError}, })
 def view_message(message_id:int, db: Session = Depends(get_db)):
     check_message_exists(db, message_id)
     return crud.view_message(db, message_id)
@@ -135,6 +134,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 @app.get('/')
 def welcome(db: Session = Depends(get_db)):
     return { 'msg' : 'Hello World'}
+
 
 def main():
     uvicorn.run('simpleapi:app', host='0.0.0.0', port=8080, reload=True)

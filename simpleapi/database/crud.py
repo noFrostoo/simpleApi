@@ -41,11 +41,14 @@ def view_message(db: Session, id: int) -> models.Message:
 def get_message_by_id(db: Session, id: int) -> models.Message:
     rows = db.query(models.Message).filter(models.Message.id == id).all()
     if rows != 0:
-        pass # raise expecption
+        raise NoMessageOfThisId
     return rows[0] 
 
 def get_user(db: Session, username: str) -> models.User:
-    return db.query(models.User).filter(models.User.username == username).all()[0]
+    rows = db.query(models.User).filter(models.User.username == username).all()
+    if len(rows) == 0:
+        return None
+    return rows[0]
 
 def add_user(db: Session, username: str, password: str) -> models.User:
     new_user = models.User()
@@ -59,3 +62,8 @@ def add_user(db: Session, username: str, password: str) -> models.User:
 def check_msg_exists(db: Session, id: int) -> bool:
     rows = db.query(models.Message).filter(models.Message.id == id).all()
     return len(rows) != 0
+
+
+
+class NoMessageOfThisId(Exception):
+    pass
