@@ -34,6 +34,9 @@ def get_db():
     finally:
         db.close()
 
+
+
+#* AUTHORIZATION UTILS
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -78,6 +81,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return user
 
+
+#* APP UTILS
 def check_message_len(content: str):
     if len(content) == 0:
         raise HTTPException(status_code=400, detail='Non zero length message is required')
@@ -86,30 +91,33 @@ def check_message_len(content: str):
 
 def check_message_exists(db:Session ,message_id: int):
     if not crud.check_msg_exists(db, message_id):
-        raise HTTPException(status_code=400, detail='Message of this id does not exists')
+        raise HTTPException(status_code=404, detail='Message of this id does not exists')
 
-@app.post('/new', response_model=schemas.Message)
+
+
+
+@app.post('/new', response_model=schemas.Message, responses={400: {"model": schemas.HTTPError}, 413: {"model": schemas.HTTPError}})
 def new_message(message: schemas.MessageBase, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     check_message_len(message.content)
     return crud.create_message(db, message)
 
-@app.put('/{message_id}', response_model=schemas.Message)
+@app.put('/{message_id}', response_model=schemas.Message, responses={400: {"model": schemas.HTTPError}, 413: {"model": schemas.HTTPError}, 404: {"model": schemas.HTTPError}})
 def edit_message(message_id:int, message: schemas.MessageBase, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     check_message_exists(db, message_id)
     check_message_len(message.content)
     return crud.edit_message(db, message, message_id)
 
-@app.delete('/{message_id}', response_model=bool)
+@app.delete('/{message_id}', response_model=bool, responses={404: {"model": schemas.HTTPError}})
 def delete_message(message_id:int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     check_message_exists(db, message_id)
     return crud.delete_message(db, message_id)
 
-@app.get('/{message_id}', response_model=schemas.Message)
+@app.get('/{message_id}', response_model=schemas.Message, responses={404: {"model": schemas.HTTPError}})
 def view_message(message_id:int, db: Session = Depends(get_db)):
     check_message_exists(db, message_id)
     return crud.view_message(db, message_id)
 
-@app.post("/authorize", response_model=schemas.Token)
+@app.post("/authorize", response_model=schemas.Token, responses={401: {"model": schemas.HTTPError}})
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
